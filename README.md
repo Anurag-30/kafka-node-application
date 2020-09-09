@@ -71,6 +71,7 @@ __________________________________________________________________________
 Suggested minikube start configuration:
 ```
 minikube start --memory=6144 --cpus=4
+
 ```
 ## Quick Start
 
@@ -79,6 +80,8 @@ once the minikube is up and running you can start the kafka by running.
 ```
 kafka.sh start
 ```
+
+### Or Alternatively run the following commands
 
 ## Instructions to build the cluster
 
