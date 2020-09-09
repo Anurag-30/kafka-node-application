@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: event-bus-listener-ms
+  labels:
+    app: event-bus-listener-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: event-bus-listener-ms
+  template:
+    metadata:
+      labels:
+        app: event-bus-listener-ms
+    spec:
+      containers:
+      - name: event-bus-listener-ms
+        image: lucasjellema/node-app-runner
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: GIT_URL
+          value: "https://github.com/lucasjellema/2019-fontys-business-and-IT-agility-through-microservice-architecture"
+        - name: APP_PORT
+          value: "8096"
+        - name: APP_HOME
+          value: "4-kafka/event-bus-listener"
+        - name: APP_STARTUP
+          value: "EventBusListener.js"
+        - name: KAFKA_HOST
+          value: "kafka.kafka-ca1"
+        - name: ZOOKEEPER_PORT
+          value: "9092"
+        - name: KAFKA_TOPIC
+          value: "event-bus"
+        ports:
+            # containerPort is the port exposed by the container (where nodejs express api is listening)
+        - containerPort: 8096
+            

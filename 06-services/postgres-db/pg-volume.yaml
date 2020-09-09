@@ -1,0 +1,65 @@
+kind: PersistentVolume
+apiVersion: v1
+metadata:
+  name: postgres-pv-volume
+  labels:
+    type: local
+    app: postgres
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 1Gi
+  accessModes:
+    - ReadWriteMany
+  hostPath:
+    path: "/mnt/data"
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: postgres-claim
+  labels:
+    app: postgres
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: postgres-service
+  labels:
+    app: postgres-service
+spec:
+  selector:
+    matchLabels:
+      app: postgres-service # has to match .spec.template.metadata.labels
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: postgres-service
+        tier: postgres
+    spec:
+      containers:
+      - name: postgres-service
+        image: postgres:9.6
+        imagePullPolicy: "IfNotPresent"
+        ports:
+        - containerPort: 5432
+          name: postgres     
+        volumeMounts:
+        - name: postgres-persistent-storage
+          mountPath: /postgres
+        envFrom:
+        - configMapRef:
+            name: postgres-config
+      volumes:
+      - name: postgres-persistent-storage
+        persistentVolumeClaim:
+          claimName: postgres-claim                   

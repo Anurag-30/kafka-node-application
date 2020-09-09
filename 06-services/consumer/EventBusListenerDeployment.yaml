@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: consumer-ms
+  labels:
+    app: consumer-ms
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: consumer-ms
+  template:
+    metadata:
+      labels:
+        app: consumer-ms
+    spec:
+      containers:
+      - name: consumer
+        image: imanurag30/kafka-node:v0.1
+        imagePullPolicy: IfNotPresent
+        env:
+        - name: POSTGRES_USER
+          value: "alphaone"
+        - name: APP_PORT
+          value: "8098"
+        - name: HOST
+          value: "postgres-service"
+        - name: POSTGRES_PASSWORD
+          value: "securityisoverrated"
+        # assuming Kafka was started on minikube using https://github.com/d1egoaz/minikube-kafka-cluster
+        # the Zookeeper cluster is exposed through the service known as zookeeper-service.kafka-ca1 within the Minikube cluster
+        - name: KAFKA_HOST
+          value: "kafka.kafka-ca1"
+        - name: ZOOKEEPER_PORT
+          value: "9092"
+        - name: KAFKA_TOPIC
+          value: "event-bus"        
+        ports:
+        - containerPort: 8098
+        readinessProbe:
+          httpGet:
+            path: /
+            port: 8098
+          failureThreshold: 2
+          periodSeconds: 10
+        startupProbe:
+          httpGet:
+            path: /
+            port: 8098
+          failureThreshold: 10
+          periodSeconds: 15             
